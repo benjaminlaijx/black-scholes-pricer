@@ -44,3 +44,12 @@ Put price ≈ 5.57
 1. Clone the repository:
    ```bash
    git clone https://github.com/benjaminlaijx/black-scholes-pricer.git
+   
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   
+3. Run the example script:
+   ```bash
+   python examples/example_run.py
+
