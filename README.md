@@ -25,4 +25,4 @@ The model computes intermediate terms \( d_1 \) and \( d_2 \), which are then us
 ## How to Run
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/black-scholes-pricer.git
+   git clone https://github.com/benjaminlaijx/black-scholes-pricer.git
