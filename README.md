@@ -34,7 +34,7 @@ The model outputs approximately:
 Call price ≈ 10.45
 Put price ≈ 5.57
 
-Limitations
+## Limitations
 - Assumes constant volatility and interest rates
 - Supports European options only
 - Does not account for dividends
