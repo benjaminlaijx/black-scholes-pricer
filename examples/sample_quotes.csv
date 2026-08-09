@@ -1,0 +1,4 @@
+underlying,S,K,r,sigma,T,market_price,option_type,note
+PLACEHOLDER_SPY,450.00,450.00,0.045,0.15,0.0833,8.20,call,"REPLACE with real S, market_price, and implied vol pulled from a live options chain before using this for real"
+PLACEHOLDER_SPY,450.00,460.00,0.045,0.15,0.0833,3.10,call,"REPLACE with real quote data"
+PLACEHOLDER_SPY,450.00,440.00,0.045,0.15,0.0833,2.40,put,"REPLACE with real quote data"

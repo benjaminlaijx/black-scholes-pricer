@@ -52,6 +52,15 @@ Validation vs. Monte Carlo simulation (S=K=100, sigma=20%, T=1, r=5%):
   Put-call parity holds: True
 ```
 
+## Benchmarking Against Real Market Quotes
+`src/benchmark.py` compares model prices against real option quotes you supply (it does not fetch live data itself). Fill in `examples/sample_quotes.csv` with real strike, expiry, market price, and implied vol from a live options chain, then run:
+```bash
+python examples/run_market_benchmark.py
+```
+This reports the model's absolute and percentage error against each real quote, plus mean/max error across the set — the actual check for "does this model's price agree with what the market is quoting," as distinct from the Monte Carlo check, which only validates internal consistency between the closed-form formula and simulation, not agreement with real market prices.
+
+**Note:** `examples/sample_quotes.csv` ships with placeholder rows (clearly marked) so the script is runnable out of the box. Replace them with real quotes before treating the output as an actual validation result.
+
 ## Tests
 ```bash
 python -m pytest tests/ -v
