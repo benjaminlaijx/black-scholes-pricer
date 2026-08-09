@@ -1,4 +1,4 @@
 underlying,S,K,r,sigma,T,market_price,option_type,note
-PLACEHOLDER_SPY,450.00,450.00,0.045,0.15,0.0833,8.20,call,"REPLACE with real S, market_price, and implied vol pulled from a live options chain before using this for real"
-PLACEHOLDER_SPY,450.00,460.00,0.045,0.15,0.0833,3.10,call,"REPLACE with real quote data"
-PLACEHOLDER_SPY,450.00,440.00,0.045,0.15,0.0833,2.40,put,"REPLACE with real quote data"
+SPY,772.75,720,0.045,0.6604,0.00274,52.97,call,"Real quote Aug 9 2026 exp Aug 10 2026 (1 day). Mid of bid/ask. sigma = single constant vol (K=722's quoted IV, 66.04%) used across all 3 strikes to test the constant-volatility assumption, not each option's own back-solved IV."
+SPY,772.75,722,0.045,0.6604,0.00274,50.98,call,"Real quote, same batch. This strike's own quoted IV (66.04%) is the sigma used for all 3 rows."
+SPY,772.75,725,0.045,0.6604,0.00274,47.98,call,"Real quote, same batch."
