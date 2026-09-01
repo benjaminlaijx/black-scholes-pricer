@@ -52,14 +52,23 @@ Validation vs. Monte Carlo simulation (S=K=100, sigma=20%, T=1, r=5%):
   Put-call parity holds: True
 ```
 
-## Benchmarking Against Real Market Quotes
-`src/benchmark.py` compares model prices against real option quotes you supply (it does not fetch live data itself). Fill in `examples/sample_quotes.csv` with real strike, expiry, market price, and implied vol from a live options chain, then run:
+## Backtest: Covered-Call Overlay vs. Buy-and-Hold
 ```bash
-python examples/run_market_benchmark.py
+python examples/run_backtest.py
 ```
-This reports the model's absolute and percentage error against each real quote, plus mean/max error across the set — the actual check for "does this model's price agree with what the market is quoting," as distinct from the Monte Carlo check, which only validates internal consistency between the closed-form formula and simulation, not agreement with real market prices.
+Backtests a systematic covered-call overlay on SPY, rebalanced every 21 trading days: sell a call struck `otm_pct` above spot (priced with this repo's own `call_price()`, using trailing realized volatility as the sigma input), hold to expiry, reinvest, repeat. Compares against a buy-and-hold benchmark over the same period.
 
-**Note:** `examples/sample_quotes.csv` ships with placeholder rows (clearly marked) so the script is runnable out of the box. Replace them with real quotes before treating the output as an actual validation result.
+Requires `pip install yfinance` for live data. Without network access, pass a local CSV instead:
+```bash
+python examples/run_backtest.py --csv path/to/spy_prices.csv
+```
+(CSV needs `Date` and `Close`/`Adj Close` columns.)
+
+Prints CAGR, annualized volatility, Sharpe ratio, max drawdown, and win rate for both the strategy and the benchmark, and saves:
+- `output/backtest_equity_curve.png` — growth of $1, strategy vs. benchmark
+- `output/backtest_results.csv` — period-by-period NAV, premiums collected, and realized vol used
+
+**Assumptions / limitations:** no transaction costs or bid/ask spread, no early assignment, sigma is estimated from trailing realized volatility rather than market-implied vol, fixed OTM% and tenor across the whole backtest. These are stated explicitly rather than hidden — a real trading desk would need to relax most of them, but the point of this backtest is to demonstrate the pricer can drive an actual P&L simulation with honestly reported performance stats, not to claim an alpha-generating strategy.
 
 ## Tests
 ```bash
