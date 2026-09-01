@@ -36,6 +36,13 @@ def realized_vol(prices, window=21, trading_days=252):
     Uses only data up to and including each date (no lookahead) --
     the value at date t is computed from returns in (t-window, t].
     """
+    prices = pd.Series(prices).squeeze()
+    if not isinstance(prices, pd.Series):
+        raise TypeError(
+            "prices must be a 1-D Series (got something with multiple "
+            "columns) -- if this came from yfinance, squeeze it down to "
+            "a single column first, e.g. df['Close'].iloc[:, 0]."
+        )
     log_ret = np.log(prices / prices.shift(1))
     return log_ret.rolling(window).std() * np.sqrt(trading_days)
 

@@ -34,6 +34,11 @@ def load_price_history(ticker="SPY", start="2019-01-01", end=None, csv_path=None
     if df.empty:
         raise ValueError(f"No price data returned for {ticker} between {start} and {end}.")
 
-    prices = df["Close"].dropna()
+    prices = df["Close"]
+    # Newer yfinance versions return multi-level columns (one per ticker)
+    # even for a single-ticker download -- squeeze down to a plain Series.
+    if isinstance(prices, pd.DataFrame):
+        prices = prices.iloc[:, 0]
+    prices = prices.dropna()
     prices.name = ticker
     return prices
