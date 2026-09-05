@@ -23,17 +23,15 @@ os.makedirs(OUT_DIR, exist_ok=True)
 def main():
     S, K = 100.0, 100.0
 
-    # 1. Build the scenario grid (1,200 scenarios by default)
     df = build_scenario_grid(S=S, K=K, option_type="call")
     print(f"Ran {len(df):,} scenarios across sigma x T x r.\n")
 
-    # 2. Quantify sensitivity to each input
     summary = sensitivity_summary(df)
     print("Sensitivity summary (holding other inputs at grid medians):")
     print(summary.to_string(index=False))
     print()
 
-    # 3. Validate the closed-form pricer against Monte Carlo simulation
+    # Validate the closed-form pricer against an independent Monte Carlo simulation
     base_sigma, base_T, base_r = 0.20, 1.0, 0.05
     closed_form = call_price(S, K, base_r, base_sigma, base_T)
     mc_est, mc_se = mc_price(S, K, base_r, base_sigma, base_T,
@@ -45,7 +43,6 @@ def main():
     print(f"  Put-call parity holds: {put_call_parity_check(S, K, base_r, base_sigma, base_T)}")
     print()
 
-    # 4. Plots: price surface / sensitivity curves
     mid_T = df["T"].unique()[len(df["T"].unique()) // 2]
     mid_r = df["r"].unique()[len(df["r"].unique()) // 2]
     mid_sigma = df["sigma"].unique()[len(df["sigma"].unique()) // 2]
