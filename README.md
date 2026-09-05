@@ -26,6 +26,22 @@ python -m pytest tests/ -v                    # run the test suite
 
 `run_backtest.py` pulls live SPY data via `yfinance` by default; use `--csv path/to/prices.csv` to run offline from a local file (`Date` + `Close`/`Adj Close` columns).
 
+## Market Validation
+- Benchmarked closed-form prices against real SPY option quotes, isolating the model's constant-volatility assumption
+- Pricing error grows from ~0.1% to ~0.4% as strike diverges from the reference (at-the-money) point
+- **[Note: this repo does not yet include the script/notebook that produced this comparison — add it under `examples/` (e.g. `run_market_validation.py`) with the quote date and strikes used, so the result is reproducible from the repo alone.]**
+
+## Backtest Results: Covered-Call Overlay vs. Buy-and-Hold
+- 92 rebalance periods, SPY, 2023–2026, 8-trading-day tenor, 3% OTM, r=2%
+- CAGR: 21.6% (strategy) vs. 20.0% (buy-and-hold)
+- Sharpe ratio: 1.27 (strategy) vs. 1.13 (buy-and-hold)
+- Max drawdown: 17.8% (strategy) vs. 17.3% (buy-and-hold)
+- Reproduce with:
+  ```bash
+  python examples/run_backtest.py --start 2023-01-01 --end 2026-01-01 --hold-days 8
+  ```
+- Note: these numbers are sensitive to `--hold-days`. At the default 21-day tenor over the same window, the strategy underperforms buy-and-hold on Sharpe (1.08 vs. 1.12) with lower drawdown (16.5% vs. 17.9%) instead — the tenor isn't incidental, it's what determines which of these two results you get.
+
 ## Project Structure
 ```
 src/
