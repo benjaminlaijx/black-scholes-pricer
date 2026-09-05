@@ -20,6 +20,7 @@ pip install -r requirements.txt
 ```bash
 python examples/example_run.py               # price a single option
 python examples/run_scenario_analysis.py      # 1,200-scenario grid + sensitivity + MC validation
+python examples/run_market_validation.py      # benchmark against live SPY option quotes
 python examples/run_backtest.py               # covered-call backtest vs. buy-and-hold
 python -m pytest tests/ -v                    # run the test suite
 ```
@@ -27,9 +28,14 @@ python -m pytest tests/ -v                    # run the test suite
 `run_backtest.py` pulls live SPY data via `yfinance` by default; use `--csv path/to/prices.csv` to run offline from a local file (`Date` + `Close`/`Adj Close` columns).
 
 ## Market Validation
-- Benchmarked closed-form prices against real SPY option quotes, isolating the model's constant-volatility assumption
-- Pricing error grows from ~0.1% to ~0.4% as strike diverges from the reference (at-the-money) point
-- **[Note: this repo does not yet include the script/notebook that produced this comparison — add it under `examples/` (e.g. `run_market_validation.py`) with the quote date and strikes used, so the result is reproducible from the repo alone.]**
+- Benchmarked closed-form prices against a live SPY option chain, using a single ATM implied vol as sigma across every strike (OTM calls only, >=25 days to expiry, quotes below $0.10 excluded)
+- Pricing error stayed under 1% at the money but grew to a mean of ~55% (peaking near 88%) for calls 4-5% out of the money — quantifying the cost of the constant-volatility assumption against the market's actual volatility skew
+- This is a live-market snapshot, not a fixed computation — quotes move constantly, so the exact numbers only reproduce from the saved chain snapshot below, not from a fresh live pull
+- Reproduce with:
+  ```bash
+  python examples/run_market_validation.py --csv output/chain_snapshot_2026-10-02.csv
+  ```
+- Full comparison: `output/market_validation.csv` | Raw chain snapshot: `output/chain_snapshot_2026-10-02.csv`
 
 ## Backtest Results: Covered-Call Overlay vs. Buy-and-Hold
 - 92 rebalance periods, SPY, 2023–2026, 8-trading-day tenor, 3% OTM, r=2%
@@ -49,6 +55,7 @@ src/
   greeks.py             # delta, gamma, vega, theta, rho
   monte_carlo.py        # GBM simulation used to validate the closed-form solution
   scenario_engine.py    # scenario grid + sensitivity summary
+  market_validation.py   # live SPY option chain fetch + comparison vs. closed-form
   backtest.py            # covered-call overlay backtest + performance metrics
   data.py                # price history loader (yfinance or local CSV)
 examples/               # runnable scripts for each of the above
