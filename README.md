@@ -29,7 +29,7 @@ python -m pytest tests/ -v                    # run the test suite
 
 ## Market Validation
 - Benchmarked closed-form prices against a live SPY option chain, using a single ATM implied vol as sigma across every strike (OTM calls only, >=25 days to expiry, quotes below $0.10 excluded)
-- Pricing error stayed under 1% at the money but grew to a mean of ~55% (peaking near 88%) for calls 4-5% out of the money — quantifying the cost of the constant-volatility assumption against the market's actual volatility skew
+- Pricing error was ~4% within 1% of the money, rose to a mean of ~83% (peaking near 88%) for calls 4-5% out of the money, and averaged ~56% across all strikes more than 2% OTM — quantifying the cost of the constant-volatility assumption against the market's actual volatility skew
 - This is a live-market snapshot, not a fixed computation — quotes move constantly, so the exact numbers only reproduce from the saved chain snapshot below, not from a fresh live pull
 - Reproduce with:
   ```bash
@@ -38,15 +38,22 @@ python -m pytest tests/ -v                    # run the test suite
 - Full comparison: `output/market_validation.csv` | Raw chain snapshot: `output/chain_snapshot_2026-10-02.csv`
 
 ## Backtest Results: Covered-Call Overlay vs. Buy-and-Hold
-- 92 rebalance periods, SPY, 2023–2026, 8-trading-day tenor, 3% OTM, r=2%
-- CAGR: 21.6% (strategy) vs. 20.0% (buy-and-hold)
-- Sharpe ratio: 1.27 (strategy) vs. 1.13 (buy-and-hold)
-- Max drawdown: 17.8% (strategy) vs. 17.3% (buy-and-hold)
+SPY daily closes, 2023-01-03 to 2025-12-31 (unadjusted close, no dividend reinvestment), 3% OTM, r=2%.
+
+| Tenor | Periods | CAGR (strategy) | CAGR (B&H) | Sharpe (strategy) | Sharpe (B&H) | Max DD (strategy) | Max DD (B&H) |
+|---|---|---|---|---|---|---|---|
+| 8-day  | 92 | 20.1% | 18.4% | 1.19 | 1.05 | 17.8% | 17.6% |
+| 21-day | 35 | 14.7% | 18.4% | 1.00 | 1.03 | 16.8% | 18.3% |
+
+The overlay beats buy-and-hold on both CAGR and Sharpe at an 8-day tenor, but *loses* on both at the default 21-day tenor — tenor isn't incidental, it's what determines which of these two results you get.
+
+These numbers use unadjusted closing prices, so buy-and-hold CAGR is understated relative to a total-return series (no dividends reinvested); the strategy side is affected less since much of its return comes from premium income rather than price appreciation. Numbers will differ slightly with an adjusted-close source (e.g. `yfinance` with `auto_adjust=True`).
 - Reproduce with:
   ```bash
-  python examples/run_backtest.py --start 2023-01-01 --end 2026-01-01 --hold-days 8
+  python examples/run_backtest.py --csv output/spy_prices_2023_2026.csv --start 2023-01-01 --end 2026-01-01 --hold-days 8
+  python examples/run_backtest.py --csv output/spy_prices_2023_2026.csv --start 2023-01-01 --end 2026-01-01 --hold-days 21
   ```
-- Note: these numbers are sensitive to `--hold-days`. At the default 21-day tenor over the same window, the strategy underperforms buy-and-hold on Sharpe (1.08 vs. 1.12) with lower drawdown (16.5% vs. 17.9%) instead — the tenor isn't incidental, it's what determines which of these two results you get.
+- Price data: `output/spy_prices_2023_2026.csv` | Saved period-by-period results (8-day run): `output/backtest_results.csv`
 
 ## Project Structure
 ```
